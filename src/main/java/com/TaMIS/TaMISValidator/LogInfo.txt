@@ -1,0 +1,6 @@
+password=vmV#GnX?U837.8,?
+user=tamis
+realm=TAMIS
+authType=basic
+host=fluggs.wupperverband.de
+port=80

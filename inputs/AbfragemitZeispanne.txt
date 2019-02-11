@@ -1,0 +1,1 @@
+http://fluggs.wupperverband.de/sos2-tamis/api/v1/timeseries/451/getData?timespan=P0Y1M/2018-09-12T12:00:00

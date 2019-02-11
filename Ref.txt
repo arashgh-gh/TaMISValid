@@ -1,0 +1,148 @@
+public void sendPostRequestold(String target, StringEntity body) throws Exception {
+
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost httpPost = new HttpPost("http://tamis.dev.52north.org/tamis-rest/api/v1/services/1/processes/org.n52.wps.server.r.tamis-rest-prediction-single");
+        httpPost.setHeader("Content-type", "application/json");
+        try {
+
+            httpPost.getRequestLine();
+            SosPostBodyBuilder wpsPostBodyConstructor = new SosPostBodyBuilder();
+            StringEntity stringEntity = wpsPostBodyConstructor.buildPostBody();
+            httpPost.setEntity(stringEntity);
+
+            HttpResponse response = httpClient.execute(httpPost);
+
+
+            // ****** reading the headers of the response from post request ******
+
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                System.out.println("Key : " + header.getName()
+                        + " ,Value : " + header.getValue());
+            }
+            // making a string out of the wps-link which was received from post request
+            String outputLink = response.getFirstHeader("Location").getValue();
+            System.out.println(outputLink);
+
+            // ****** End ******
+
+            // ****** sending the outputLink to get the progress output (wps results) ******
+
+            URL link = new URL(outputLink);
+            con = (HttpURLConnection) link.openConnection();
+
+            //TimeUnit.MILLISECONDS.sleep(2890);
+            con.setRequestMethod("GET");
+            TimeUnit.SECONDS.sleep(5);
+
+            StringBuilder content;
+
+
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()))) {
+
+                String line;
+                content = new StringBuilder();
+
+                while ((line = in.readLine()) != null) {
+                    content.append(line);
+                    content.append(System.lineSeparator());
+
+                }
+            }
+
+            System.out.println(content.toString());
+
+            // ****** End ******
+
+
+            // ****** reading the content json to have the output link ******
+
+            JSONParser jsonParser = new JSONParser();
+
+            Object object = jsonParser.parse(String.valueOf(content));
+            JSONObject jsonObject = (JSONObject) object;
+
+            JSONObject results = (JSONObject) jsonObject.get("StatusInfo");
+            String resultURL = (String) results.get("Output");
+            System.out.println(resultURL);
+
+            //****** End ******
+
+            // ****** sending the WPS Results link to receive the final results ******
+
+            URL WPSResults = new URL(resultURL);
+            con = (HttpURLConnection) WPSResults.openConnection();
+            con.setRequestMethod("GET");
+
+            StringBuilder newContent;
+
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()))) {
+
+                String newLine;
+                newContent = new StringBuilder();
+
+                while ((newLine = in.readLine()) != null) {
+                    newContent.append(newLine);
+                    newContent.append(System.lineSeparator());
+
+                }
+            }
+
+            System.out.println(newContent.toString());
+
+            // ****** End ******
+
+            //***** Reading the JSON from the final results ******
+            JSONParser newJsonParser = new JSONParser();
+            Object newObject = newJsonParser.parse(String.valueOf(newContent));
+            JSONObject newJsonObject = (JSONObject) newObject;
+
+            JSONArray resultArray = (JSONArray) newJsonObject.get("result");
+            String value = null;
+            for (int i = 0; i < resultArray.size(); i++) {
+                JSONObject jsonObject1 = (JSONObject) resultArray.get(i);
+                value = (String) jsonObject1.get("value");
+                System.out.println(value);
+            }
+            System.out.println("### Link of the time series:");
+            System.out.println(value);
+
+
+            // ***** End ******
+
+            URL timeSeriesJSON = new URL(value);
+
+
+            String fileName = "time.json";
+            Path targetPath = new File("output" + File.separator + fileName).toPath();
+            Files.copy(timeSeriesJSON.openStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            BufferedReader reader = null;
+            reader = new BufferedReader(new FileReader("output/time.json"));
+            String line;
+            String fileContent = "";
+            while ((line = reader.readLine()) != null) {
+
+                fileContent += line;
+
+                //System.out.println(line);
+            }
+            System.out.println(fileContent);
+
+
+            JSONParser timeSeriesJsonParser = new JSONParser();
+            Object timeSeriesObject = timeSeriesJsonParser.parse(fileContent);
+            JSONObject timeSeriesJsonObject = (JSONObject) timeSeriesObject;
+            JSONArray timeSeriesArray = (JSONArray) timeSeriesJsonObject.get("values");
+
+
+            // TO DO --> JSON to CSV
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }

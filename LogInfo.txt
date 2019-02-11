@@ -1,0 +1,6 @@
+password=!!!
+user=!!!
+realm=TAMIS
+authType=basic
+host=fluggs.wupperverband.de
+port=80

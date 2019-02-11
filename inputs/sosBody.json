@@ -1,0 +1,57 @@
+{
+        "inputs": [{
+                "id": "timeseriesNiederschlag",
+                "value": "http://www.fluggs.de/sos2/api/v1/timeseries/427",
+                "type": "text/plain"
+        },
+        {
+                "id": "timeseriesFuellstand",
+                "value": "http://www.fluggs.de/sos2/api/v1/timeseries/26",
+                "type": "text/plain"
+        },
+        {
+                "id": "timeseriesZielvariable",
+                "value": "http://fluggs.wupperverband.de/sos2-tamis/api/v1/timeseries/451",
+                "type": "text/plain"
+        },
+        {
+                "id": "timespan",
+                "value": "2018-06-09T10:57:26.402Z/2018-09-09T09:57:26.402Z",
+                "type": "text/plain"
+        },
+        {
+                "id": "singleInputNiederschlag",
+                "value": "145",
+                "type": "text/plain"
+        },
+        {
+                "id": "singleInputFuellstand",
+                "value": "292",
+                "type": "text/plain"
+        },
+        {
+                "id": "singleInputZeitstempel",
+                "value": "2018-08-10T21:57:26.402Z",
+                "type": "text/plain"
+        }],
+        "outputs": [{
+                "id": "modelDiagnostics",
+                "type": "image/png"
+        },
+        {
+                "id": "relations",
+                "type": "image/png"
+        },
+        {
+                "id": "modelPrediction",
+                "type": "text/csv"
+        },
+        {
+                "id": "metaJson",
+                "type": "application/json"
+        },
+        {
+                "id": "dataJson",
+                "type": "application/json"
+        }]
+}
